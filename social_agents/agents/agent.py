@@ -23,9 +23,9 @@ class Agent:
 
         self.memory = []
         # TODO: Use the name, persona and replace_prompt to fill in the system prompt, estimate 1 line
-        self.system_prompt = replace_prompt(self.system_prompt, {"name": self.name, "persona": self.persona})
+        
         # TODO: Initialize the agent's memory with the system prompt, estimate 1 line
-        self.memory.append({"role": "system", "content": self.system_prompt})
+        
 
     def respond(self, user_input: str) -> int:
         """
@@ -38,17 +38,12 @@ class Agent:
             int: If the response is even, return 1. If the response is odd, return 0.
         """
         # TODO: Use the user input and replace_prompt to fill in the user prompt, estimate 1 line
-        user_prompt = replace_prompt(self.user_prompt, {"user_input": user_input})
+        
         # TODO: Add the user prompt to the agent's memory, estimate 1 line
-        self.memory.append({"role": "user", "content": user_prompt})
+        
         # TODO: Use the memory, OddOrEven and json_chat to do three things:
         # 1. generate a response
         # 2. add the response to the memory
         # 3. return the function
         # estimate 6 lines
-        response = json_chat(messages=self.memory, response_format=OddOrEven)
-        self.memory.append({"role": "assistant", "content": str(response)})
-        if response["parity"] == "even":
-            return 1
-        else:
-            return 0
+        
