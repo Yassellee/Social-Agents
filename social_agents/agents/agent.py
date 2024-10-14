@@ -32,9 +32,7 @@ class Agent:
         self.memory.append({"role": "system", "content": self.system_prompt})
 
         # TODO: Use the background and vectorize to vectorize the background information, estimate 3 lines
-        self.background_vectors = []
-        for background_line in background:
-            self.background_vectors.append(vectorize(background_line))
+        
 
     def rag(self, user_input: str) -> str:
         """
@@ -51,14 +49,11 @@ class Agent:
 
         # TODO: Use cosine_similarity to calculate the similarities between the user input vector and the background vectors
         # Tip: Use flatten() to convert the result to a 1D array, estimate 1 line
-        similarities = cosine_similarity(user_input_vector, self.background_vectors).flatten()
         
         # TODO: Get the index of the most similar background entry
         # Tip: Use np.argmax to get the index of the maximum value, estimate 1 line
-        most_similar_index = np.argmax(similarities)
         
         # TODO: Retrieve and return the most relevant background information, estimate 1 line
-        return self.background[most_similar_index]
 
     def respond(self, user_input: str) -> int:
         """
