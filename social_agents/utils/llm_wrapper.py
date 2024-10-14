@@ -1,0 +1,63 @@
+from typing import List, Dict
+from openai import OpenAI
+
+
+client = OpenAI(api_key='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')
+
+
+def json_chat(messages: List[Dict[str, str]],
+              response_format,
+              model: str = 'gpt-4o-2024-08-06',
+              temperature: float = 0.7,
+              enable_print: bool = False) -> str:
+    
+    def _chat():
+        while True:
+            try:
+                response = client.beta.chat.completions.parse(
+                    model=model,
+                    messages=messages,
+                    temperature=temperature,
+                    response_format=response_format
+                )
+                result = response.choices[0].message.content
+                
+                def extract_json(input_string):
+                    stack = []
+                    json_start_positions = []
+
+                    for pos, char in enumerate(input_string):
+                        if char in '{[':
+                            stack.append(char)
+                            if len(stack) == 1:
+                                json_start_positions.append(pos)
+                        elif char in '}]':
+                            if len(stack) == 0:
+                                raise ValueError("unexpected {} at position {}".format(pos, char))
+                            last_open = stack.pop()
+                            if (last_open == '{' and char != '}') or (last_open == '[' and char != ']'):
+                                raise ValueError("mismatched brackets {} and {} at position {}".format(last_open, char, pos))
+                            if len(stack) == 0:
+                                return input_string[json_start_positions.pop():pos+1]
+                    return None
+                
+                result = extract_json(result)
+                result = eval(result, {'true': True, 'false': False, 'null': None})
+                
+                if enable_print:
+                    print(result)             
+                return result
+            
+            except Exception as e:
+                print(f"Error in json_chat: {e}")
+                continue
+    
+    response = _chat()
+    return response
+
+
+def replace_prompt(raw_prompt: str, information: Dict[str, str]) -> str:
+    for key, value in information.items():
+        raw_prompt = raw_prompt.replace(f"%{key}%", value)
+
+    return raw_prompt
