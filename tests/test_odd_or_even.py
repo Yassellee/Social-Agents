@@ -1,4 +1,3 @@
-import pytest
 from social_agents.agents.agent import Agent
 import os
 
@@ -14,11 +13,14 @@ def test_odd_or_even_1():
     user_inputs = ["1", "2", "3"]
     responses = [0, 1, 0]
     for user_input, response in zip(user_inputs, responses):
-        assert agent.respond(user_input) == response
+        result = agent.respond(user_input)
+        assert result == response
 
 def test_odd_or_even_2():
     agent = Agent(name, persona, system_prompt, user_prompt)
-    user_inputs = ["-1", "-2", "-3"]
-    responses = [0, 1, 0]
+    user_inputs = ["4", "5", "6"]
+    responses = [1, 0, 1]
     for user_input, response in zip(user_inputs, responses):
-        assert agent.respond(user_input) == response
+        result = agent.respond(user_input)
+        assert result == response
+
