@@ -3,7 +3,7 @@ from openai import OpenAI
 import numpy as np
 import json
 
-client = OpenAI(api_key='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')
+client = OpenAI(api_key='')
 
 def json_chat(messages: List[Dict[str, str]],
               response_format,
