@@ -1,8 +1,9 @@
 from typing import List, Dict
 from social_agents.utils.llm_wrapper import json_chat, replace_prompt, vectorize
-from social_agents.utils.type_defs import OddOrEven
+from social_agents.utils.type_defs import NumberOfRs, calculate_number_of_rs, tools_calculate_number_of_rs
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
+import json
 
 class Agent:
     def __init__(self, name: str, persona: str, system_prompt: str, user_prompt: str, background: List[str]):
@@ -31,7 +32,7 @@ class Agent:
         # Initialize the agent's memory with the system prompt, estimate 1 line
         self.memory.append({"role": "system", "content": self.system_prompt})
 
-        # TODO: Use the background and vectorize to vectorize the background information, estimate 3 lines
+        # Use the background and vectorize to vectorize the background information, estimate 3 lines
         self.background_vectors = []
         for background_line in background:
             self.background_vectors.append(vectorize(background_line))
@@ -49,15 +50,15 @@ class Agent:
         """
         user_input_vector = vectorize(user_input).reshape(1, -1)
 
-        # TODO: Use cosine_similarity to calculate the similarities between the user input vector and the background vectors
+        # Use cosine_similarity to calculate the similarities between the user input vector and the background vectors
         # Tip: Use flatten() to convert the result to a 1D array, estimate 1 line
         similarities = cosine_similarity(user_input_vector, self.background_vectors).flatten()
         
-        # TODO: Get the index of the most similar background entry
+        # Get the index of the most similar background entry
         # Tip: Use np.argmax to get the index of the maximum value, estimate 1 line
         most_similar_index = np.argmax(similarities)
         
-        # TODO: Retrieve and return the most relevant background information, estimate 1 line
+        # Retrieve and return the most relevant background information, estimate 1 line
         return self.background[most_similar_index]
 
     def respond(self, user_input: str) -> int:
@@ -68,20 +69,29 @@ class Agent:
             user_input (str): The user input.
 
         Returns:
-            int: If the response is even, return 1. If the response is odd, return 0.
+            int: Number of Rs in the user input.
         """
-        # Use the user input and replace_prompt to fill in the user prompt, estimate 1 line
-        user_prompt = replace_prompt(self.user_prompt, {"user_input": user_input})
-        # Add the user prompt to the agent's memory, estimate 1 line
-        self.memory.append({"role": "user", "content": user_prompt})
-        # Use the memory, OddOrEven and json_chat to do three things:
-        # 1. generate a response
-        # 2. add the response to the memory
-        # 3. return the function
-        # estimate 6 lines
-        response = json_chat(messages=self.memory, response_format=OddOrEven)
-        self.memory.append({"role": "assistant", "content": str(response)})
-        if response["parity"] == "even":
-            return 1
+        # TODO: Append the user input to the agent's memory, estimate 1 line
+        self.memory.append({"role": "user", "content": user_input})
+
+        # TODO: Use json_chat, memory, response format, and the tools definition to get a response, estimate 1 line
+        response = json_chat(self.memory, response_format=NumberOfRs, tools=tools_calculate_number_of_rs)
+        if response.get('role') == 'tool':
+            arguments = response.get('arguments')
+            # TODO: Use calculate_number_of_rs and arguments['text'] to calculate the number of Rs, estimate 1 line
+            number_of_rs = calculate_number_of_rs(arguments['text'])
+            self.memory.append(response.get('message'))
+            function_call_result_message = {
+                "role": "tool",
+                "content": json.dumps({
+                    "number": number_of_rs
+                }),
+                "tool_call_id": response.get('id')
+            }
+            self.memory.append(function_call_result_message)
+            # TODO: Use json_chat to get the final response, no need to use the tools definition here, estimate 1 line
+            response = json_chat(self.memory, response_format=NumberOfRs)
+            return response['number']
         else:
-            return 0
+            return -1
+        
