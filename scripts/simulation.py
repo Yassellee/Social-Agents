@@ -22,7 +22,8 @@ with open('agents.json', 'r') as file:
 agent1 = None
 agent2 = None
 # TODO: Initialize the two agents, estimate 2 liens
-
+agent1 = Agent(agents[0]['name'], agents[0]['persona'], system_prompt, user_prompt)
+agent2 = Agent(agents[1]['name'], agents[1]['persona'], system_prompt, user_prompt)
 
 def beautiful_print(agent_name, response):
     print()
@@ -44,10 +45,11 @@ agent1_made_decision = False
 agent2_made_decision = False
 flowing_words = ""
 # TODO: Please fill in the flowing_words with something, hints are already in the code, estimate 1 line
+flowing_words = agent1_mimic_question['content']
 
 while True:
     # TODO: Get the response from agent2, estimate 1 line
-    
+    agent2_response = agent2.respond(flowing_words)
     beautiful_print(agent2.name, agent2_response)
     agent2_made_decision = agent2_response['make_decision']
     if agent1_made_decision and agent2_made_decision:
@@ -57,7 +59,7 @@ while True:
     else:
         flowing_words = agent2_response['content']
     # TODO: Get the response from agent1, estimate 1 line
-    
+    agent1_response = agent1.respond(flowing_words)
     beautiful_print(agent1.name, agent1_response)
     agent1_made_decision = agent1_response['make_decision']
     if agent1_made_decision and agent2_made_decision:
