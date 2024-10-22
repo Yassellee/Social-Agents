@@ -1,6 +1,6 @@
 from typing import List, Dict
 from social_agents.utils.llm_wrapper import json_chat, replace_prompt
-from social_agents.utils.type_defs import OddOrEven
+from social_agents.utils.type_defs import OddOrEven, EvacuationDiscussion
 
 class Agent:
     def __init__(self, name: str, persona: str, system_prompt: str, user_prompt: str):
@@ -25,6 +25,7 @@ class Agent:
         # TODO: Use the name, persona and replace_prompt to fill in the system prompt, estimate 1 line
         
         # TODO: Initialize the agent's memory with the system prompt, estimate 1 line
+        # Tip: The memory should be a list of dictionaries, each dictionary should have a "content" key and a "role" key
         
 
     def respond(self, user_input: str) -> int:
@@ -36,6 +37,7 @@ class Agent:
 
         Returns:
             int: If the response is even, return 1. If the response is odd, return 0.
+            # TODO: if using EvacuationDiscussion, return type is dict
         """
         # TODO: Use the user input and replace_prompt to fill in the user prompt, estimate 1 line
         
@@ -46,4 +48,8 @@ class Agent:
         # 2. add the response to the memory
         # 3. return the function
         # estimate 6 lines
+        
+        # TODO: After you pass the test cases, use EvacuationDiscussion instead, add the response to the memory, return the response, estimate 3 lines
+        
+        
         
