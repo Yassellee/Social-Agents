@@ -14,6 +14,7 @@ def test_odd_or_even_1():
     responses = [0, 1, 0]
     for user_input, response in zip(user_inputs, responses):
         result = agent.respond(user_input)
+        print(agent.memory)
         assert result == response
 
 def test_odd_or_even_2():
@@ -23,4 +24,9 @@ def test_odd_or_even_2():
     for user_input, response in zip(user_inputs, responses):
         result = agent.respond(user_input)
         assert result == response
+
+if __name__ == "__main__":
+    test_odd_or_even_1()
+    test_odd_or_even_2()
+    print("All test cases passed!")
 

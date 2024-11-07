@@ -19,11 +19,10 @@ with open('user_prompt.txt', 'r') as file:
 with open('agents.json', 'r') as file:
     agents = json.load(file)
 
-agent1 = None
-agent2 = None
-# TODO: Initialize the two agents, estimate 2 liens
+# Initialize the three agents
 agent1 = Agent(agents[0]['name'], agents[0]['persona'], system_prompt, user_prompt)
 agent2 = Agent(agents[1]['name'], agents[1]['persona'], system_prompt, user_prompt)
+agent3 = Agent(agents[2]['name'], agents[2]['persona'], system_prompt, user_prompt)
 
 def beautiful_print(agent_name, response):
     print()
@@ -34,37 +33,105 @@ def beautiful_print(agent_name, response):
         print(f"{agent_name} does not make a decision yet.")
     print()
 
-# Initial question from agent1
-agent1_mimic_question = {
+# Initial messages from agents
+agent1_response = {
     "content": "You have also heard about the fire right?",
     "make_decision": False,
     "decision": "Pending"
 }
-agent1.memory.append({"content": str(agent1_mimic_question), "role": "assistant"})
-agent1_made_decision = False
-agent2_made_decision = False
-flowing_words = ""
-# TODO: Please fill in the flowing_words with something, hints are already in the code, estimate 1 line
-flowing_words = agent1_mimic_question['content']
+agent1.memory.append({"content": str(agent1_response), "role": "assistant"})
+
+agent2_response = {
+    "content": "Yes, I have heard about the fire.",
+    "make_decision": False,
+    "decision": "Pending"
+}
+agent2.memory.append({"content": str(agent1_response), "role": "user"})
+agent2.memory.append({"content": str(agent2_response), "role": "assistant"})
+
+# Agent 3 has not responded yet
+agent3_response = None
+
+agent1_made_decision = agent1_response['make_decision']
+agent2_made_decision = agent2_response['make_decision']
+agent3_made_decision = False  # Agent 3 has not made any decision yet
+
+def build_flowing_words(agent1_response, agent2_response, agent3_response):
+    flowing_words = {}
+    # For agent1
+    messages = []
+    if agent2_response:
+        if agent2_response['make_decision']:
+            messages.append(f"Person 2 has made a decision: {agent2_response['decision']} and said: {agent2_response['content']}")
+        else:
+            messages.append(f"Person 2 said: {agent2_response['content']}")
+    if agent3_response:
+        if agent3_response['make_decision']:
+            messages.append(f"Person 3 has made a decision: {agent3_response['decision']} and said: {agent3_response['content']}")
+        else:
+            messages.append(f"Person 3 said: {agent3_response['content']}")
+    flowing_words['agent1'] = '\n'.join(messages)
+
+    # For agent2
+    messages = []
+    if agent1_response:
+        if agent1_response['make_decision']:
+            messages.append(f"Person 1 has made a decision: {agent1_response['decision']} and said: {agent1_response['content']}")
+        else:
+            messages.append(f"Person 1 said: {agent1_response['content']}")
+    if agent3_response:
+        if agent3_response['make_decision']:
+            messages.append(f"Person 3 has made a decision: {agent3_response['decision']} and said: {agent3_response['content']}")
+        else:
+            messages.append(f"Person 3 said: {agent3_response['content']}")
+    flowing_words['agent2'] = '\n'.join(messages)
+
+    # For agent3
+    messages = []
+    if agent1_response:
+        if agent1_response['make_decision']:
+            messages.append(f"Person 1 has made a decision: {agent1_response['decision']} and said: {agent1_response['content']}")
+        else:
+            messages.append(f"Person 1 said: {agent1_response['content']}")
+    if agent2_response:
+        if agent2_response['make_decision']:
+            messages.append(f"Person 2 has made a decision: {agent2_response['decision']} and said: {agent2_response['content']}")
+        else:
+            messages.append(f"Person 2 said: {agent2_response['content']}")
+    flowing_words['agent3'] = '\n'.join(messages)
+
+    return flowing_words
+
+# Build initial flowing words
+flowing_words = build_flowing_words(agent1_response, agent2_response, agent3_response)
 
 while True:
-    # TODO: Get the response from agent2, estimate 1 line
-    agent2_response = agent2.respond(flowing_words)
-    beautiful_print(agent2.name, agent2_response)
-    agent2_made_decision = agent2_response['make_decision']
-    if agent1_made_decision and agent2_made_decision:
+    # Agent 3's turn
+    agent3_response = agent3.respond(flowing_words['agent3'])
+    beautiful_print(agent3.name, agent3_response)
+    agent3_made_decision = agent3_response['make_decision']
+    if agent1_made_decision and agent2_made_decision and agent3_made_decision:
         break
-    if agent2_made_decision:
-        flowing_words = f"The other person has made a decision: {agent2_response['decision']} and also left a message: {agent2_response['content']}"
-    else:
-        flowing_words = agent2_response['content']
-    # TODO: Get the response from agent1, estimate 1 line
-    agent1_response = agent1.respond(flowing_words)
+
+    # Update flowing words after Agent 3's response
+    flowing_words = build_flowing_words(agent1_response, agent2_response, agent3_response)
+
+    # Agent 1's turn
+    agent1_response = agent1.respond(flowing_words['agent1'])
     beautiful_print(agent1.name, agent1_response)
     agent1_made_decision = agent1_response['make_decision']
-    if agent1_made_decision and agent2_made_decision:
+    if agent1_made_decision and agent2_made_decision and agent3_made_decision:
         break
-    if agent1_made_decision:
-        flowing_words = f"The other person has made a decision: {agent1_response['decision']} and also left a message: {agent1_response['content']}"
-    else:
-        flowing_words = agent1_response['content']
+
+    # Update flowing words after Agent 1's response
+    flowing_words = build_flowing_words(agent1_response, agent2_response, agent3_response)
+
+    # Agent 2's turn
+    agent2_response = agent2.respond(flowing_words['agent2'])
+    beautiful_print(agent2.name, agent2_response)
+    agent2_made_decision = agent2_response['make_decision']
+    if agent1_made_decision and agent2_made_decision and agent3_made_decision:
+        break
+
+    # Update flowing words after Agent 2's response
+    flowing_words = build_flowing_words(agent1_response, agent2_response, agent3_response)

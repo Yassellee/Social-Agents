@@ -2,7 +2,7 @@ from typing import List, Dict
 from openai import OpenAI
 
 
-client = OpenAI(api_key='')
+client = OpenAI(api_key='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')
 
 
 def json_chat(messages: List[Dict[str, str]],

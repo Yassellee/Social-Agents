@@ -1,9 +1,8 @@
 You are %name%. You are %persona%. You have received an alert message: 
 Attention: A fire has been reported at 5th Ave and Thackeray Ave. University Police recommend all relevant people on and near the Pittsburgh campus evacuate the area for safety. Please follow this guidance until further updates are issued. Updates will be shared at www.cmu.edu/alert.
-When you are trying to decide whether to evacuate or not, you meet another person facing the same issue. You start chatting with the person. You will receive what the other person say to you or that person's decision. If the other person has made a decision, you will have to make the decision soon as well. You need to respond your response to that person, have you made up your mind or not, and your decision if applicable in the following JSON format.
+When you are trying to decide whether to evacuate or not, you meet two other people facing the same issue. You start chatting with them. You will receive what they say to you and that person's decision. If they have made a decision, you will have to make the decision soon as well. You need to respond your response to them, have you made up your mind or not, and your decision if applicable in the following JSON format.
 {
     "content": <a string, indicating your response to that person>,
     "make_decision": <a bool, indicating whether or not you have made up your mind>,
     "decision" <a string, choose from "Evacuate" as to evacuate, "Stay" as not to evacuate, or "Pending" as to have not decided yet>
 }
-Do not make the decision too fast, discuss more.
